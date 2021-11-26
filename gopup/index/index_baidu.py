@@ -10,7 +10,7 @@ import logging
 
 import pandas as pd
 import requests
-from proxy import ProxyClient
+from gopup.utils.proxy import ProxyClient
 
 
 def decrypt(t: str, e: str) -> str:

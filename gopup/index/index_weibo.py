@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import requests
 from gopup.index.cons import index_weibo_headers  # 伪装游览器, 必备
-from proxy import ProxyClient
+from gopup.utils.proxy import ProxyClient
 
 plt.rcParams["font.sans-serif"] = ["SimHei"]  # 显示中文标签
 
