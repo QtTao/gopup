@@ -5,13 +5,15 @@
 # @File    : index_weibo.py
 # @Desc    : 获取微博指数
 
-import re
 import datetime
+import logging
+import re
+
+import matplotlib.pyplot as plt
 import pandas as pd
 import requests
-import matplotlib.pyplot as plt
-
 from gopup.index.cons import index_weibo_headers  # 伪装游览器, 必备
+from proxy import ProxyClient
 
 plt.rcParams["font.sans-serif"] = ["SimHei"]  # 显示中文标签
 
@@ -23,13 +25,13 @@ def _get_items(word="股票"):
     return {word: re.findall(r"\d+", res.json()["html"])[0]}
 
 
-def _get_index_data(wid, time_type):
+def _get_index_data(wid, time_type, proxies: ProxyClient = None):
     url = "http://data.weibo.com/index/ajax/newindex/getchartdata"
     data = {
         "wid": wid,
         "dateGroup": time_type,
     }
-    res = requests.get(url, params=data, headers=index_weibo_headers)
+    res = requests.get(url, params=data, headers=index_weibo_headers, proxies=proxies.to_dict() if proxies else None)
     json_df = res.json()
     data = {
         "index": json_df["data"][0]["trend"]["x"],
@@ -52,17 +54,17 @@ def _process_index(index):
     return index
 
 
-def weibo_index(word="python", time_type="3month"):
+def weibo_index(word="python", time_type="3month", proxies: ProxyClient = None):
     """
     :param word: str
-    :param time_type: str 1hour, 1day, 1month, 3month
+    :param time_type: str 1hour, 1day, 1month, 3month （不包含当天）
     :return:
     """
     try:
         dict_keyword = _get_items(word)
         df_list = []
         for keyword, wid in dict_keyword.items():
-            df = _get_index_data(wid, time_type)
+            df = _get_index_data(wid, time_type, proxies=proxies)
             if df is not None:
                 df.columns = ["index", keyword]
                 df["index"] = df["index"].apply(lambda x: _process_index(x))
@@ -75,7 +77,8 @@ def weibo_index(word="python", time_type="3month"):
             else:
                 df.index = pd.to_datetime(df.index, format="%Y%m%d")
             return df
-    except:
+    except Exception as e:
+        logging.error(e)
         return None
 
 
@@ -84,7 +87,3 @@ if __name__ == "__main__":
     print(df_index)
     df_index.plot()
     plt.show()
-
-
- 
-
