@@ -5,6 +5,7 @@
 # @File    : index_baidu.py
 # @Desc    : 获取百度指数
 
+from datetime import time
 import json
 import logging
 
@@ -30,7 +31,7 @@ def decrypt(t: str, e: str) -> str:
     return "".join([a[j] for j in e])
 
 
-def get_ptbk(uniqid: str, cookie: str, proxies: ProxyClient = None) -> str:
+def get_ptbk(uniqid: str, cookie: str, proxies: ProxyClient = None, retries=3) -> str:
     headers = {
         "Accept": "application/json, text/plain, */*",
         "Accept-Encoding": "gzip, deflate",
@@ -45,9 +46,17 @@ def get_ptbk(uniqid: str, cookie: str, proxies: ProxyClient = None) -> str:
     session = requests.Session()
     session.headers.update(headers)
     session.proxies = proxies.to_dict() if proxies else None
-    with session.get(url=f"http://index.baidu.com/Interface/ptbk?uniqid={uniqid}") as response:
-        ptbk = response.json()["data"]
-        return ptbk
+    for _ in range(retries):
+        try:
+            resp = session.get(url=f"http://index.baidu.com/Interface/ptbk?uniqid={uniqid}")
+            ptbk = resp.json()["data"]
+            return ptbk
+        except Exception as e:
+            logging.error(resp.json())
+            logging.error(e)
+            time.sleep(5)
+    else:
+        raise e
 
 
 def baidu_interest_index(word, cookie, proxies: ProxyClient = None):
@@ -325,7 +334,7 @@ def baidu_info_index(word, start_date, end_date, cookie, proxies: ProxyClient = 
         data = r.json()["data"]
         all_data = data["index"][0]["data"]
         uniqid = data["uniqid"]
-        ptbk = get_ptbk(uniqid, cookie)
+        ptbk = get_ptbk(uniqid, cookie, proxies=proxies)
         result = decrypt(ptbk, all_data).split(",")
         result = [int(item) if item != "" else 0 for item in result]
         temp_df_7 = pd.DataFrame(
