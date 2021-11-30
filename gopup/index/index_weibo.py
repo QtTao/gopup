@@ -21,8 +21,12 @@ plt.rcParams["font.sans-serif"] = ["SimHei"]  # 显示中文标签
 def _get_items(word="股票"):
     url = "https://data.weibo.com/index/ajax/newindex/searchword"
     payload = {"word": word}
-    res = requests.post(url, data=payload, headers=index_weibo_headers)
-    return {word: re.findall(r"\d+", res.json()["html"])[0]}
+    try:
+        res = requests.post(url, data=payload, headers=index_weibo_headers)
+        return {word: re.findall(r"\d+", res.json()["html"])[0]}
+    except Exception as e:
+        logging.error(res.text)
+        raise e
 
 
 def _get_index_data(wid, time_type, proxies: ProxyClient = None):
