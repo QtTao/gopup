@@ -31,14 +31,19 @@ def _get_index_data(wid, time_type, proxies: ProxyClient = None):
         "wid": wid,
         "dateGroup": time_type,
     }
-    res = requests.get(url, params=data, headers=index_weibo_headers, proxies=proxies.to_dict() if proxies else None)
-    json_df = res.json()
-    data = {
-        "index": json_df["data"][0]["trend"]["x"],
-        "value": json_df["data"][0]["trend"]["s"],
-    }
-    df = pd.DataFrame(data)
-    return df
+    try:
+        res = requests.get(
+            url, params=data, headers=index_weibo_headers, proxies=proxies.to_dict() if proxies else None
+        )
+        json_df = res.json()
+        data = {
+            "index": json_df["data"][0]["trend"]["x"],
+            "value": json_df["data"][0]["trend"]["s"],
+        }
+        df = pd.DataFrame(data)
+        return df
+    except Exception as e:
+        raise Exception(f'{res.text} {e}')
 
 
 def _process_index(index):

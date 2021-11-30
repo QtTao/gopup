@@ -96,6 +96,7 @@ def baidu_interest_index(word, cookie, proxies: ProxyClient = None):
         res_df.rename(columns={'rate_x': 'word_rate', 'rate_y': 'all_rate'}, inplace=True)
         return res_df
     except Exception as e:
+        logging.error(r.json())
         logging.error(e)
         return None
 
@@ -146,6 +147,7 @@ def baidu_gender_index(word, cookie, proxies: ProxyClient = None):
         res_df.rename(columns={'rate_x': 'word_rate', 'rate_y': 'all_rate'}, inplace=True)
         return res_df
     except Exception as e:
+        logging.error(r.json())
         logging.error(e)
         return None
 
@@ -196,6 +198,7 @@ def baidu_age_index(word, cookie, proxies: ProxyClient = None):
         res_df.rename(columns={'rate_x': 'word_rate', 'rate_y': 'all_rate'}, inplace=True)
         return res_df
     except Exception as e:
+        logging.error(r.json())
         logging.error(e)
         return None
 
@@ -248,6 +251,7 @@ def baidu_atlas_index(word, cookie, date=None, proxies: ProxyClient = None):
         df = pd.DataFrame(res_list)
         return df
     except Exception as e:
+        logging.error(r.json())
         logging.error(e)
         return None
 
@@ -291,6 +295,7 @@ def baidu_search_index(word, start_date, end_date, cookie, type="all", proxies: 
         del temp_df_7["date"]
         return temp_df_7
     except Exception as e:
+        logging.error(r.json())
         logging.error(e)
         return None
 
@@ -331,6 +336,7 @@ def baidu_info_index(word, start_date, end_date, cookie, proxies: ProxyClient = 
         del temp_df_7["date"]
         return temp_df_7
     except Exception as e:
+        logging.error(r.json())
         logging.error(e)
         return None
 
@@ -372,6 +378,7 @@ def baidu_media_index(word, start_date, end_date, cookie, proxies: ProxyClient =
         del temp_df_7["date"]
         return temp_df_7
     except Exception as e:
+        logging.error(r.json())
         logging.error(e)
         return None
 
