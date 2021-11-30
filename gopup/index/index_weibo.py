@@ -39,6 +39,7 @@ def _get_index_data(wid, time_type, proxies: ProxyClient = None):
         res = requests.get(
             url, params=data, headers=index_weibo_headers, proxies=proxies.to_dict() if proxies else None
         )
+        logging.info(res.text)
         json_df = res.json()
         data = {
             "index": json_df["data"][0]["trend"]["x"],
@@ -47,7 +48,7 @@ def _get_index_data(wid, time_type, proxies: ProxyClient = None):
         df = pd.DataFrame(data)
         return df
     except Exception as e:
-        raise Exception(f'{res.text} {e}')
+        raise e
 
 
 def _process_index(index):

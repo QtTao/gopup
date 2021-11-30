@@ -5,7 +5,7 @@
 # @File    : index_baidu.py
 # @Desc    : 获取百度指数
 
-from datetime import time
+import time
 import json
 import logging
 
@@ -49,10 +49,11 @@ def get_ptbk(uniqid: str, cookie: str, proxies: ProxyClient = None, retries=3) -
     for _ in range(retries):
         try:
             resp = session.get(url=f"http://index.baidu.com/Interface/ptbk?uniqid={uniqid}")
-            ptbk = resp.json()["data"]
+            json_data = resp.json()
+            logging.info(json_data)
+            ptbk = json_data["data"]
             return ptbk
         except Exception as e:
-            logging.error(resp.json())
             logging.error(e)
             time.sleep(5)
     else:
@@ -89,6 +90,7 @@ def baidu_interest_index(word, cookie, proxies: ProxyClient = None):
         }
         url = "http://index.baidu.com/api/SocialApi/interest?wordlist[]=%s" % word
         r = requests.get(url=url, headers=headers, proxies=proxies.to_dict() if proxies else None)
+        logging.info(r.text)
         data = json.loads(r.text)['data']
         period = "%s|%s" % (data['startDate'], data['endDate'])
 
@@ -105,7 +107,6 @@ def baidu_interest_index(word, cookie, proxies: ProxyClient = None):
         res_df.rename(columns={'rate_x': 'word_rate', 'rate_y': 'all_rate'}, inplace=True)
         return res_df
     except Exception as e:
-        logging.error(r.json())
         logging.error(e)
         return None
 
@@ -140,6 +141,7 @@ def baidu_gender_index(word, cookie, proxies: ProxyClient = None):
         }
         url = "http://index.baidu.com/api/SocialApi/baseAttributes?wordlist[]=%s" % word
         r = requests.get(url=url, headers=headers, proxies=proxies.to_dict() if proxies else None)
+        logging.info(r.json())
         data = json.loads(r.text)['data']
         period = "%s|%s" % (data['startDate'], data['endDate'])
 
@@ -156,7 +158,6 @@ def baidu_gender_index(word, cookie, proxies: ProxyClient = None):
         res_df.rename(columns={'rate_x': 'word_rate', 'rate_y': 'all_rate'}, inplace=True)
         return res_df
     except Exception as e:
-        logging.error(r.json())
         logging.error(e)
         return None
 
@@ -191,6 +192,7 @@ def baidu_age_index(word, cookie, proxies: ProxyClient = None):
         }
         url = "http://index.baidu.com/api/SocialApi/baseAttributes?wordlist[]=%s" % word
         r = requests.get(url=url, headers=headers, proxies=proxies.to_dict() if proxies else None)
+        logging.info(r.json())
         data = json.loads(r.text)['data']
         period = "%s|%s" % (data['startDate'], data['endDate'])
 
@@ -207,7 +209,6 @@ def baidu_age_index(word, cookie, proxies: ProxyClient = None):
         res_df.rename(columns={'rate_x': 'word_rate', 'rate_y': 'all_rate'}, inplace=True)
         return res_df
     except Exception as e:
-        logging.error(r.json())
         logging.error(e)
         return None
 
@@ -245,6 +246,7 @@ def baidu_atlas_index(word, cookie, date=None, proxies: ProxyClient = None):
             date = ""
         url = "http://index.baidu.com/api/WordGraph/multi?wordlist[]=%s&datelist=%s" % (word, date)
         r = requests.get(url=url, headers=headers, proxies=proxies.to_dict() if proxies else None)
+        logging.info(r.json())
         data = json.loads(r.text)['data']
         wordlist = data['wordlist'][0]['wordGraph']
         res_list = []
@@ -260,7 +262,6 @@ def baidu_atlas_index(word, cookie, date=None, proxies: ProxyClient = None):
         df = pd.DataFrame(res_list)
         return df
     except Exception as e:
-        logging.error(r.json())
         logging.error(e)
         return None
 
@@ -290,6 +291,7 @@ def baidu_search_index(word, start_date, end_date, cookie, type="all", proxies: 
         )
 
         r = requests.get(url=url, headers=headers, proxies=proxies.to_dict() if proxies else None)
+        logging.info(r.json())
         data = r.json()["data"]
         all_data = data["userIndexes"][0][type]["data"]
         uniqid = data["uniqid"]
@@ -304,7 +306,6 @@ def baidu_search_index(word, start_date, end_date, cookie, type="all", proxies: 
         del temp_df_7["date"]
         return temp_df_7
     except Exception as e:
-        logging.error(r.json())
         logging.error(e)
         return None
 
@@ -331,6 +332,7 @@ def baidu_info_index(word, start_date, end_date, cookie, proxies: ProxyClient = 
         )
 
         r = requests.get(url=url, headers=headers, proxies=proxies.to_dict() if proxies else None)
+        logging.info(r.json())
         data = r.json()["data"]
         all_data = data["index"][0]["data"]
         uniqid = data["uniqid"]
@@ -345,7 +347,6 @@ def baidu_info_index(word, start_date, end_date, cookie, proxies: ProxyClient = 
         del temp_df_7["date"]
         return temp_df_7
     except Exception as e:
-        logging.error(r.json())
         logging.error(e)
         return None
 
@@ -372,7 +373,7 @@ def baidu_media_index(word, start_date, end_date, cookie, proxies: ProxyClient =
         )
 
         r = requests.get(url=url, headers=headers, proxies=proxies.to_dict() if proxies else None)
-
+        logging.info(r.json())
         data = r.json()["data"]
         all_data = data["index"][0]["data"]
         uniqid = data["uniqid"]
@@ -387,7 +388,6 @@ def baidu_media_index(word, start_date, end_date, cookie, proxies: ProxyClient =
         del temp_df_7["date"]
         return temp_df_7
     except Exception as e:
-        logging.error(r.json())
         logging.error(e)
         return None
 
