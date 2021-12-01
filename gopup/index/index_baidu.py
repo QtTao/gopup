@@ -57,7 +57,7 @@ def get_ptbk(uniqid: str, cookie: str, proxies: ProxyClient = None, retries=3) -
             logging.error(e)
             time.sleep(5)
     else:
-        raise e
+        raise Exception('failed to get ptbk')
 
 
 def baidu_interest_index(word, cookie, proxies: ProxyClient = None):
