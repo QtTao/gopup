@@ -41,6 +41,9 @@ def _get_index_data(wid, time_type, proxies: ProxyClient = None):
         )
         logging.info(res.text)
         json_df = res.json()
+        if json_df['code'] == 101:
+            logging.info('no data')
+            return pd.DataFrame()
         data = {
             "index": json_df["data"][0]["trend"]["x"],
             "value": json_df["data"][0]["trend"]["s"],
