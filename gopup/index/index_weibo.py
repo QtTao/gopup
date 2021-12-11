@@ -23,7 +23,10 @@ def _get_items(word="股票"):
     payload = {"word": word}
     try:
         res = requests.post(url, data=payload, headers=index_weibo_headers)
-        return {word: re.findall(r"\d+", res.json()["html"])[0]}
+        json_data = res.json()
+        if json_data.get('code') == 101:
+            return {}
+        return {word: re.findall(r"\d+", json_data["html"])[0]}
     except Exception as e:
         logging.error(res.text)
         raise e
@@ -41,9 +44,6 @@ def _get_index_data(wid, time_type, proxies: ProxyClient = None):
         )
         logging.info(res.text)
         json_df = res.json()
-        if json_df['code'] == 101:
-            logging.info('no data')
-            return pd.DataFrame()
         data = {
             "index": json_df["data"][0]["trend"]["x"],
             "value": json_df["data"][0]["trend"]["s"],
@@ -75,6 +75,8 @@ def weibo_index(word="python", time_type="3month", proxies: ProxyClient = None):
     """
     try:
         dict_keyword = _get_items(word)
+        if isinstance(dict_keyword, dict) and not dict_keyword:
+            return pd.DataFrame()
         df_list = []
         for keyword, wid in dict_keyword.items():
             df = _get_index_data(wid, time_type, proxies=proxies)
